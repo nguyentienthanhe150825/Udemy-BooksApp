@@ -10,6 +10,7 @@ import BookPage from "./pages/book/index.jsx";
 import Header from "./components/Header/index.jsx";
 import Footer from "./components/Footer/index.jsx";
 import Home from "./components/Home/index";
+import Register from './pages/register/index.jsx';
 
 const Layout = () => {
   return (
@@ -43,6 +44,10 @@ export default function App() {
     {
       path: "/login",
       element: <LoginPage />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
     },
   ]);
 
