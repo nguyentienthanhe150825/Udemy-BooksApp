@@ -1,9 +1,8 @@
 import React from 'react';
-import { Button, Divider, Form, Input } from 'antd';
-
-const onFinish = (values) => {
-    console.log('Success:', values);
-};
+import { Button, Divider, Form, Input, message, notification } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { callRegister } from '../../services/api';
 
 const registerLayout = {
     marginTop: '100px',
@@ -22,9 +21,32 @@ const styleForm = {
 
 
 const Register = () => {
+    const navigate = useNavigate();
+    const [isSubmit, setIsSubmit] = useState(false);
+
+    const onFinish = async (values) => {
+        const { fullName, email, password, phone } = values;
+        setIsSubmit(true);
+        const res = await callRegister(fullName, email, password, phone);
+        setIsSubmit(false);
+        // console.log('>>> check data: ', res);
+        if (res?.data?._id) {
+            message.success('Đăng ký tài khoản thành công!');
+            navigate('/login')
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra',
+                description:
+                    res.message && res.message.length > 0 ? res.message[0] : res.message,
+                duration: 5
+            })
+        }
+
+    };
+
     return (
         <div className='register-page' style={registerLayout}>
-            <h3 style={{ textAlign: 'center' }}>Đăng ký người dùng mới</h3>
+            <h1 style={{ textAlign: 'center' }}>Đăng Ký Tài Khoản</h1>
             <Divider />
             <Form
                 name="basic"
@@ -99,10 +121,16 @@ const Register = () => {
                         span: 16,
                     }}
                 >
-                    <Button type="primary" htmlType="submit">
-                        Submit
+                    <Button type="primary" htmlType="submit" loading={isSubmit}>
+                        Register
                     </Button>
                 </Form.Item>
+                <Divider>Or</Divider>
+                <p className='text text-normal'>Đã có tài khoản ?
+                    <span>
+                        <Link to='/login'> Đăng Nhập </Link>
+                    </span>
+                </p>
             </Form>
         </div>
     );
