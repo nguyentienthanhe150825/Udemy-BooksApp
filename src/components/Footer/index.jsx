@@ -1,9 +1,11 @@
+import './footer.scss';
+
 
 const Footer = () => {
     return (
-        <div>
-            footer
-        </div>
+        <footer>
+            <div>React &copy;2023 by NTT</div>
+        </footer>
     )
 }
 

@@ -3,6 +3,7 @@ import { Button, Divider, Form, Input, message, notification } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { callRegister } from '../../services/api';
+import './register.scss';
 
 const registerLayout = {
     marginTop: '100px',
@@ -25,20 +26,23 @@ const Register = () => {
     const [isSubmit, setIsSubmit] = useState(false);
 
     const onFinish = async (values) => {
+        //Lấy ra giá trị mà điền ở trong Form
         const { fullName, email, password, phone } = values;
+        //Gọi tới API register
         setIsSubmit(true);
         const res = await callRegister(fullName, email, password, phone);
         setIsSubmit(false);
-        // console.log('>>> check data: ', res);
-        if (res?.data?._id) {
+        console.log('>>> check data register: ', res);
+        if (res && res.data && res.data._id) {
+            // if (res?.data?._id) {
             message.success('Đăng ký tài khoản thành công!');
             navigate('/login')
         } else {
             notification.error({
                 message: 'Có lỗi xảy ra',
                 description:
-                    res.message && res.message.length > 0 ? res.message[0] : res.message,
-                duration: 5
+                    res.message && Array.isArray(res.message) ? res.message[0] : 'ok',
+                duration: 2
             })
         }
 
@@ -64,6 +68,7 @@ const Register = () => {
                 autoComplete="off"
             >
                 <Form.Item
+                    // labelCol={{ span: 24 }}
                     label="Full Name"
                     name="fullName"
                     rules={[
@@ -77,6 +82,7 @@ const Register = () => {
                 </Form.Item>
 
                 <Form.Item
+                    // labelCol={{ span: 24 }}
                     label="Email"
                     name="email"
                     rules={[
@@ -90,6 +96,7 @@ const Register = () => {
                 </Form.Item>
 
                 <Form.Item
+                    // labelCol={{ span: 24 }}
                     label="Password"
                     name="password"
                     rules={[
@@ -103,6 +110,7 @@ const Register = () => {
                 </Form.Item>
 
                 <Form.Item
+                    // labelCol={{ span: 24 }}
                     label="Phone"
                     name="phone"
                     rules={[
