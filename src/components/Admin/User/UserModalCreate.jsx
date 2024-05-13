@@ -55,7 +55,6 @@ const UserModalCreate = (props) => {
                     //Gán Hook- [useForm()] sau này có thể truy cập Form từ nơi khác để nhận submit
                     form={formHook}
                     name="basic"
-                    style={{ maxWidth: 600 }}
                     onFinish={onFinish}
                     autoComplete="off"
                 >

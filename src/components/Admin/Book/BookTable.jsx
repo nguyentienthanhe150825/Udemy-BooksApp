@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import InputSearchBook from "./InputSearchBook";
 import { callFetchListBook } from "../../../services/api";
 import BookViewDetail from "./BookViewDetail";
+import BookModalCreate from "./BookModalCreate";
 
 
 const BookTable = () => {
@@ -27,6 +28,8 @@ const BookTable = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [filter, setFilter] = useState("");
     const [sortQuery, setSortQuery] = useState("");
+
+    const [openModalCreate, setOpenModalCreate] = useState(false);
 
     const [openViewDetail, setOpenViewDetail] = useState(false);
     const [dataViewDetail, setDataViewDetail] = useState("")
@@ -164,6 +167,7 @@ const BookTable = () => {
                     <Button
                         icon={<PlusOutlined />}
                         type="dashed" danger
+                        onClick={() => setOpenModalCreate(true)}
                     >Thêm mới</Button>
 
                     <Button
@@ -215,6 +219,10 @@ const BookTable = () => {
                 openViewDetail={openViewDetail}
                 setOpenViewDetail={setOpenViewDetail}
                 dataViewDetail={dataViewDetail}
+            />
+            <BookModalCreate
+                openModalCreate={openModalCreate}
+                setOpenModalCreate={setOpenModalCreate}
             />
         </>
     )

@@ -45,3 +45,7 @@ export const callBulkCreateUser = (data) => {
 export const callFetchListBook = (query) => {
     return axios.get(`/api/v1/book?${query}`)
 }
+
+export const callFetchCategory = () => {
+    return axios.get('/api/v1/database/category')
+}
