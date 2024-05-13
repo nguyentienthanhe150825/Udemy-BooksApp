@@ -6,20 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 const BookViewDetail = (props) => {
     const { openViewDetail, setOpenViewDetail } = props;
     const dataViewDetail = props.dataViewDetail;
-    const setDataViewDetail = props.setDataViewDetail;
 
     const onClose = () => {
         setOpenViewDetail(false);
-        // setDataViewDetail(null);
     };
-
-    // const getBase64 = (file) =>
-    //     new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.readAsDataURL(file);
-    //         reader.onload = () => resolve(reader.result);
-    //         reader.onerror = (error) => reject(error);
-    //     });
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');

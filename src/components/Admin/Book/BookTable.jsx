@@ -146,6 +146,36 @@ const BookTable = () => {
     };
 
 
+    const renderHeader = () => {
+        return (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>Table List Book</span>
+                <span style={{ display: "flex", gap: 20 }}>
+                    <Button
+                        icon={<ExportOutlined />}
+                        type="default"
+                    >Export</Button>
+
+                    <Button
+                        icon={<CloudUploadOutlined />}
+                        type="primary"
+                    >Import</Button>
+
+                    <Button
+                        icon={<PlusOutlined />}
+                        type="dashed" danger
+                    >Thêm mới</Button>
+
+                    <Button
+                        type='ghost'
+                    >
+                        <ReloadOutlined />
+                    </Button>
+                </span>
+            </div>
+        )
+    }
+
     return (
         <>
             <Row>
@@ -156,6 +186,7 @@ const BookTable = () => {
                 </Col>
                 <Col span={24}>
                     <Table
+                        title={renderHeader}
                         loading={isLoading}
                         columns={columns}
                         dataSource={listBook}
@@ -184,7 +215,6 @@ const BookTable = () => {
                 openViewDetail={openViewDetail}
                 setOpenViewDetail={setOpenViewDetail}
                 dataViewDetail={dataViewDetail}
-                setDataViewDetail={setDataViewDetail}
             />
         </>
     )
