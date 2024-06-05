@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Form, Select, Row, Divider, Modal, message, Input, notification, Col, InputNumber } from "antd";
-import { callFetchCategory } from "../../../services/api";
+import { Form, Select, Row, Divider, Modal, message, Input, notification, Col, InputNumber, Upload } from "antd";
+import { callFetchCategory, callUploadBookImg } from "../../../services/api";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
 const BookModalCreate = (props) => {
     const { openModalCreate, setOpenModalCreate } = props;
@@ -13,7 +14,13 @@ const BookModalCreate = (props) => {
     const [loading, setLoading] = useState(false);
     const [loadingSlider, setLoadingSlider] = useState(false);
 
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+
     const [imageUrl, setImageUrl] = useState("");
+    const [dataThumbnail, setDataThumbnail] = useState([]);
+    const [dataSlider, setDataSlider] = useState([]);
 
     const fetchCategory = async () => {
         const res = await callFetchCategory();
@@ -33,15 +40,112 @@ const BookModalCreate = (props) => {
         fetchCategory();
     }, [])
 
+    const onFinish = async (values) => {
+        console.log(">>> check values: ", values);
+        console.log(">>> check data thumbnail: ", dataThumbnail);
+        console.log(">>> check data slider: ", dataSlider);
+    }
+
+    const onClose = () => {
+        setOpenModalCreate(false)
+    }
+
+    const handleChange = (info, type) => {
+        if (info.file.status === 'uploading') {
+            type ? setLoadingSlider(true) : setLoading(true)
+            return;
+        }
+
+        if (info.file.status === 'done') {
+            type ? setLoadingSlider(false) : setLoading(false)
+            setImageUrl(url)
+        }
+    }
+
+    const beforeUpload = () => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            message.error('You can only upload JPG/PNG file!');
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            message.error('Image must smaller than 2MB!');
+        }
+        return isJpgOrPng && isLt2M;
+    };
+
+    const handleUploadFileThumbnail = async ({ file, onSuccess, onError }) => {
+        //Sau khi call api để upload ảnh thì cần lưu ảnh vào state của React 
+        //để sau rồi khi tạo mới 1 book sẽ lấy dc thông tin ảnh của sách từ state của React
+        const res = await callUploadBookImg(file);
+        console.log(">>> check res call upload Thumbnail <BookModalCreate>", res);
+        if (res && res.data) {
+            setDataThumbnail([{
+                name: res.data.fileUploaded,
+                uid: file.uid
+            }])
+            onSuccess('ok')
+        } else {
+            onError('Đã có lỗi khi upload file')
+        }
+    }
+
+    const handleUploadFileSlider = async ({ file, onSuccess, onError }) => {
+        //Sau khi call api để upload ảnh thì cần lưu ảnh vào state của React 
+        //để sau rồi khi tạo mới 1 book sẽ lấy dc thông tin ảnh của sách từ state của React
+        const res = await callUploadBookImg(file);
+        if (res && res.data) {
+            //Vì slider sẽ phải upload nhiều ảnh nên trong 1 lần upload nhiều ảnh thì
+            //phải lưu lại state của ảnh trước đó nếu ko khi upload sẽ chỉ lên dc DUY NHẤT 1 ảnh mà thôi
+            //coppy previous state => upload multiple mages
+            setDataSlider((dataSlider) => [...dataSlider, {
+                name: res.data.fileUploaded,
+                uid: file.uid
+            }])
+            onSuccess('ok')
+        } else {
+            onError('Đã có lỗi khi upload file')
+        }
+    }
+
+    const handleRemoveFile = (file, type) => {
+        if (type === 'thumbnail') {
+            setDataThumbnail([])
+        }
+        //filer 1 mảng: lấy những ảnh slider (còn lại) có uid khác với uid của slider mà user bấm xóa
+        //filter: bỏ đi ảnh cần xóa
+        if (type === 'slider') {
+            // const newSlider = dataSlider.filter(sliderImage => sliderImage.uid !== file.uid);
+            // setDataSlider(newSlider);
+            setDataSlider([])
+        }
+    }
+
+    const getBase64 = (img, callback) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result));
+        reader.readAsDataURL(img);
+    };
+
+    //coppy antd sẽ khác so với bên BookViewDetail
+    const handlePreview = async (file) => {
+        getBase64(file.originFileObj, (url) => {
+            setPreviewImage(url);
+            setPreviewOpen(true);
+            setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
+        })
+    };
+
     return (
         <>
             <Modal title="Thêm mới Sách"
                 open={openModalCreate}
                 onOk={() => { formHook.submit() }}
-                onCancel={() => setOpenModalCreate(false)}
+                onCancel={onClose}
                 okText={"Tạo mới"}
                 cancelText={"Hủy"}
                 confirmLoading={isSubmit}
+                width={700}
             >
                 <Divider />
 
@@ -157,9 +261,67 @@ const BookModalCreate = (props) => {
                                 <Input />
                             </Form.Item>
                         </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                labelCol={{ span: 24 }}
+                                label="Ảnh Thumbnail"
+                                name="thumbnail"
+                            >
+                                <Upload
+                                    name="thumbnail"
+                                    listType="picture-card"
+                                    className="avatar-uploader"
+                                    //Cho upload chỉ 1 ảnh
+                                    maxCount={1}
+                                    multiple={false}
+                                    customRequest={handleUploadFileThumbnail}
+                                    beforeUpload={beforeUpload}
+                                    onChange={handleChange}
+                                    onRemove={(file) => handleRemoveFile(file, "thumbnail")}
+                                    onPreview={handlePreview}
+                                >
+                                    <div>
+                                        {loading ? <LoadingOutlined /> : <PlusOutlined />}
+                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                    </div>
+                                </Upload>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                labelCol={{ span: 24 }}
+                                label="Ảnh Slider"
+                                name="slider"
+                            >
+                                <Upload
+                                    //Cho upload nhiều ảnh
+                                    multiple
+                                    name="slider"
+                                    listType="picture-card"
+                                    className="avatar-uploader"
+                                    customRequest={handleUploadFileSlider}
+                                    beforeUpload={beforeUpload}
+                                    onChange={(infor) => handleChange(infor, 'slider')}
+                                    onRemove={(file) => handleRemoveFile(file, "slider")}
+                                    onPreview={handlePreview}
+                                >
+                                    <div>
+                                        {loadingSlider ? <LoadingOutlined /> : <PlusOutlined />}
+                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                    </div>
+                                </Upload>
+                            </Form.Item>
+                        </Col>
                     </Row>
-
                 </Form>
+            </Modal>
+            <Modal
+                open={previewOpen}
+                title={previewTitle}
+                footer={null}
+                onCancel={() => setPreviewOpen(false)}
+            >
+                <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal>
         </>
     )

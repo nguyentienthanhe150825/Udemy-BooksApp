@@ -49,3 +49,18 @@ export const callFetchListBook = (query) => {
 export const callFetchCategory = () => {
     return axios.get('/api/v1/database/category')
 }
+
+export const callUploadBookImg = (fileImg) => {
+    const bodyFormData = new FormData();
+    bodyFormData.append('fileImg', fileImg);
+    // return axios.post('/api/v1/file/upload')
+    return axios({
+        method: 'post',
+        url: '/api/v1/file/upload',
+        data: bodyFormData,
+        headers: {
+            "Content-Type" : "multipart/form-data",
+            "upload-type" : "book"
+        }
+    })
+}

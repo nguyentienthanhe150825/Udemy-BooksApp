@@ -20,6 +20,7 @@ const BookViewDetail = (props) => {
 
     //Part 5 - video 42
     useEffect(() => {
+        console.log('>>> check data view detail <BookViewDetail>: ', dataViewDetail);
         if (dataViewDetail) {
             let imgThumbnail = {};
             let imgSlider = [];
