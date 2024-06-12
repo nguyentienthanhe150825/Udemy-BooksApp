@@ -48,9 +48,6 @@ const BookViewDetail = (props) => {
         }
     }, [dataViewDetail])
 
-
-
-
     const handleCancel = () => {
         setPreviewOpen(false)
     };
@@ -81,6 +78,11 @@ const BookViewDetail = (props) => {
                     <Descriptions.Item label="Id">{dataViewDetail._id}</Descriptions.Item>
                     <Descriptions.Item label="Tên Sách">{dataViewDetail.mainText}</Descriptions.Item>
                     <Descriptions.Item label="Tác Giả">{dataViewDetail.author}</Descriptions.Item>
+                    <Descriptions.Item label="Giá Tiền">
+                        {new Intl.NumberFormat('vi-VN', {style: 'currency', currency : 'VND'}).format(dataViewDetail.price)}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Số Lượng">{dataViewDetail.quantity}</Descriptions.Item>
+                    <Descriptions.Item label="Đã Bán">{dataViewDetail.sold}</Descriptions.Item>
                     <Descriptions.Item label="Thể Loại" span={2}>
                         <Badge status="processing" text={dataViewDetail.category} />
                     </Descriptions.Item>

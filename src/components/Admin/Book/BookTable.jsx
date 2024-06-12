@@ -16,6 +16,7 @@ import InputSearchBook from "./InputSearchBook";
 import { callFetchListBook } from "../../../services/api";
 import BookViewDetail from "./BookViewDetail";
 import BookModalCreate from "./BookModalCreate";
+import moment from 'moment/moment';
 
 
 const BookTable = () => {
@@ -95,9 +96,25 @@ const BookTable = () => {
             title: 'Giá Tiền',
             dataIndex: 'price',
             sorter: true,
+            //https://stackoverflow.com/questions/37985642/vnd-currency-formatting
+            render: (text, record, index) => {
+                return (
+                    <>{new Intl.NumberFormat('vi-VN', {style: 'currency', currency : 'VND'}).format(record.price)}</>
+                )
+            }
         },
         {
-            title: 'Giá Tiền',
+            title: 'Ngày cập nhật',
+            dataIndex: 'updatedAt',
+            sorter: true,
+            render: (text, record, index) => {
+                return (
+                    <>{moment(record.updatedAt).format("DD-MM-YYYY")}</>
+                )
+            }
+        },
+        {
+            title: 'Action',
             width: 100,
             render: (text, record, index) => {
                 return (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Select, Row, Divider, Modal, message, Input, notification, Col, InputNumber, Upload } from "antd";
-import { callFetchCategory, callUploadBookImg } from "../../../services/api";
+import { callCreateBook, callFetchCategory, callUploadBookImg } from "../../../services/api";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
 const BookModalCreate = (props) => {
@@ -44,6 +44,43 @@ const BookModalCreate = (props) => {
         console.log(">>> check values: ", values);
         console.log(">>> check data thumbnail: ", dataThumbnail);
         console.log(">>> check data slider: ", dataSlider);
+        return;
+        if (dataThumbnail.length === 0) {
+            notification.error({
+                message: 'Lỗi validate',
+                description: 'Vui lòng upload ảnh thumbnail'
+            })
+            return;
+        }
+        if (dataSlider.length === 0) {
+            notification.error({
+                message: 'Lỗi validate',
+                description: 'Vui lòng upload ảnh slider'
+            })
+            return;
+        }
+
+        //Lấy ra giá trị mà điền ở trong Form
+        const { mainText, author, price, sold, quantity, category } = values;
+        const thumbnail = dataThumbnail[0].name;
+        const slider = dataSlider.map(item => item.name);
+
+        setIsSubmit(true);
+        const res = await callCreateBook(thumbnail, slider, mainText, author, price, sold, quantity, category);
+        if (res && res.data) {
+            message.success('Tạo mới book thành công')
+            formHook.resetFields();
+            setOpenModalCreate(false);
+
+            await props.fetchBook();
+        } else {
+            notification.error({
+                message: 'Đã Có lỗi xảy ra',
+                description: res.message,
+                // duration: 2
+            })
+        }
+        setIsSubmit(false);
     }
 
     const onClose = () => {
@@ -154,7 +191,7 @@ const BookModalCreate = (props) => {
                     form={formHook}
                     name="basic"
                     style={{ width: '100%' }}
-                    // onFinish={onFinish}
+                    onFinish={onFinish}
                     autoComplete="off"
                 >
                     <Row gutter={12}>
