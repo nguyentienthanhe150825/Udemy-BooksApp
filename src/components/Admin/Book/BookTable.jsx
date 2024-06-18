@@ -240,6 +240,7 @@ const BookTable = () => {
             <BookModalCreate
                 openModalCreate={openModalCreate}
                 setOpenModalCreate={setOpenModalCreate}
+                fetchBook={fetchBook}
             />
         </>
     )

@@ -18,7 +18,6 @@ const BookModalCreate = (props) => {
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
 
-    const [imageUrl, setImageUrl] = useState("");
     const [dataThumbnail, setDataThumbnail] = useState([]);
     const [dataSlider, setDataSlider] = useState([]);
 
@@ -44,7 +43,7 @@ const BookModalCreate = (props) => {
         console.log(">>> check values: ", values);
         console.log(">>> check data thumbnail: ", dataThumbnail);
         console.log(">>> check data slider: ", dataSlider);
-        return;
+        // return;
         if (dataThumbnail.length === 0) {
             notification.error({
                 message: 'Lỗi validate',
@@ -83,23 +82,13 @@ const BookModalCreate = (props) => {
         setIsSubmit(false);
     }
 
-    const onClose = () => {
-        setOpenModalCreate(false)
-    }
+    const getBase64 = (img, callback) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result));
+        reader.readAsDataURL(img);
+    };
 
-    const handleChange = (info, type) => {
-        if (info.file.status === 'uploading') {
-            type ? setLoadingSlider(true) : setLoading(true)
-            return;
-        }
-
-        if (info.file.status === 'done') {
-            type ? setLoadingSlider(false) : setLoading(false)
-            setImageUrl(url)
-        }
-    }
-
-    const beforeUpload = () => {
+    const beforeUpload = (file) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         if (!isJpgOrPng) {
             message.error('You can only upload JPG/PNG file!');
@@ -111,21 +100,31 @@ const BookModalCreate = (props) => {
         return isJpgOrPng && isLt2M;
     };
 
+    const handleChange = (info, type) => {
+        if (info.file.status === 'uploading') {
+            type ? setLoadingSlider(true) : setLoading(true);
+            return;
+        }
+        if (info.file.status === 'done') {
+            // Get this url from response in real world.
+            getBase64(info.file.originFileObj, (url) => {
+                type ? setLoadingSlider(false) : setLoading(false);
+            });
+        }
+    }
+
     const handleUploadFileThumbnail = async ({ file, onSuccess, onError }) => {
-        //Sau khi call api để upload ảnh thì cần lưu ảnh vào state của React 
-        //để sau rồi khi tạo mới 1 book sẽ lấy dc thông tin ảnh của sách từ state của React
         const res = await callUploadBookImg(file);
-        console.log(">>> check res call upload Thumbnail <BookModalCreate>", res);
         if (res && res.data) {
             setDataThumbnail([{
-                name: res.data.fileUploaded,
+                name: res.data.fileUploaded, 
                 uid: file.uid
             }])
             onSuccess('ok')
         } else {
-            onError('Đã có lỗi khi upload file')
+            onError('Đã có lỗi khi upload file');
         }
-    }
+    };
 
     const handleUploadFileSlider = async ({ file, onSuccess, onError }) => {
         //Sau khi call api để upload ảnh thì cần lưu ảnh vào state của React 
@@ -158,12 +157,6 @@ const BookModalCreate = (props) => {
         }
     }
 
-    const getBase64 = (img, callback) => {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => callback(reader.result));
-        reader.readAsDataURL(img);
-    };
-
     //coppy antd sẽ khác so với bên BookViewDetail
     const handlePreview = async (file) => {
         getBase64(file.originFileObj, (url) => {
@@ -172,6 +165,11 @@ const BookModalCreate = (props) => {
             setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
         })
     };
+
+    const onClose = () => {
+        formHook.resetFields();
+        setOpenModalCreate(false)
+    }
 
     return (
         <>
@@ -294,8 +292,9 @@ const BookModalCreate = (props) => {
                                         message: 'Vui lòng nhập số lượng đã bán đã bán',
                                     },
                                 ]}
+                                initialValue={0}
                             >
-                                <Input />
+                                <InputNumber min={0} defaultValue={0} style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
                         <Col span={12}>

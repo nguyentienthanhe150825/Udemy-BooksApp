@@ -147,9 +147,9 @@ const LayoutAdmin = () => {
                 <Content>
                     <Outlet />   {/* Children */}
                 </Content>
-                <Footer style={{ paddingTop: 0, marginLeft: 50, backgroundColor: 'orange' }}>
+                {/* <Footer style={{ paddingTop: 0, marginLeft: 50, backgroundColor: 'orange' }}>
                     &copy; 2024, Made with <HeartTwoTone />
-                </Footer>
+                </Footer> */}
             </Layout>
         </Layout>
 

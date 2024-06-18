@@ -21,7 +21,7 @@ instance.defaults.headers.common = { 'Authorization': `Bearer ${localStorage.get
 //   => Tại hàm 'getAccount()' của App.jsx => Dùng dispatch để nạp dũ liệu user vào Redux thông qua 'doGetAccountAction'
 
 
-//Video 29 - Phần 3: Axios Retry: Lấy lại access_token khi hết hạn
+//Video 32 - Phần 3: Axios Retry: Lấy lại access_token khi hết hạn
 const handleRefreshToken = async () => {
   //Gọi tới API của refresh_token của back-end (Lấy token mới)
   const res = await instance.get('/api/v1/auth/refresh');
@@ -32,7 +32,7 @@ const handleRefreshToken = async () => {
 
 
 
-//interceptor: là cách mà can thiệp vào request trước khi user nhận được phản hồi
+//interceptor: là cách mà can thiệp vào request trước khi gửi lên server back-end
 instance.interceptors.request.use(function (config) {
   // Do something before request is sent
   return config;
@@ -44,7 +44,7 @@ instance.interceptors.request.use(function (config) {
 //Dòng 57 và 63 để tránh vòng lặp ở tab Network
 const NO_RETRY_HEADER = 'x-no-retry';
 
-//interceptor: là cách mà can thiệp vào request trước khi user nhận được phản hồi
+//interceptor: là cách mà can thiệp vào response trước khi server gửi về cho client
 instance.interceptors.response.use(function (response) {
   console.log('>>> check response axios customize: ', response);
   // Any status code that lie within the range of 2xx cause this function to trigger
@@ -73,7 +73,7 @@ instance.interceptors.response.use(function (response) {
 
   }
 
-  //Video 30 - Phần 3: fix lỗi khi hết hạn cookies: refresh_token
+  //Video 32 - Phần 3: fix lỗi khi hết hạn cookies: refresh_token
   if (error.config && error.response
     && +error.response.status === 400
     && error.config.url === '/api/v1/auth/refresh'
