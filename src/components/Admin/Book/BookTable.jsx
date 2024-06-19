@@ -17,6 +17,7 @@ import { callFetchListBook } from "../../../services/api";
 import BookViewDetail from "./BookViewDetail";
 import BookModalCreate from "./BookModalCreate";
 import moment from 'moment/moment';
+import BookModalUpdate from "./BookModalUpdate";
 
 
 const BookTable = () => {
@@ -31,6 +32,9 @@ const BookTable = () => {
     const [sortQuery, setSortQuery] = useState("");
 
     const [openModalCreate, setOpenModalCreate] = useState(false);
+
+    const [dataUpdate, setDataUpdate] = useState([]);
+    const [openModalUpdate, setOpenModalUpdate] = useState(false);
 
     const [openViewDetail, setOpenViewDetail] = useState(false);
     const [dataViewDetail, setDataViewDetail] = useState("")
@@ -99,7 +103,7 @@ const BookTable = () => {
             //https://stackoverflow.com/questions/37985642/vnd-currency-formatting
             render: (text, record, index) => {
                 return (
-                    <>{new Intl.NumberFormat('vi-VN', {style: 'currency', currency : 'VND'}).format(record.price)}</>
+                    <>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price)}</>
                 )
             }
         },
@@ -134,7 +138,10 @@ const BookTable = () => {
                         <EditTwoTone
                             twoToneColor="#f57800"
                             style={{ cursor: "pointer", paddingLeft: 20 }}
-
+                            onClick={() => {
+                                setOpenModalUpdate(true);
+                                setDataUpdate(record);
+                            }}
                         />
                     </>
                 )
@@ -241,6 +248,13 @@ const BookTable = () => {
                 openModalCreate={openModalCreate}
                 setOpenModalCreate={setOpenModalCreate}
                 fetchBook={fetchBook}
+            />
+            <BookModalUpdate
+                openModalUpdate={openModalUpdate}
+                setOpenModalUpdate={setOpenModalUpdate}
+                fetchBook={fetchBook}
+                dataUpdate={dataUpdate}
+                setDataUpdate={setDataUpdate}
             />
         </>
     )
